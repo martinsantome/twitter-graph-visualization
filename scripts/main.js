@@ -196,7 +196,8 @@ FriendlyChat.prototype.onAuthStateChanged = function(user) {
     // We save the Firebase Messaging Device token and enable notifications.
     this.saveMessagingDeviceToken();
 
-    window.chessIt = new ChessIt();
+    window.chessIt = new ChessIt(new Games(this.database).loadGames(user));
+
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     this.userName.setAttribute('hidden', 'true');

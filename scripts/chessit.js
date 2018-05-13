@@ -1,14 +1,16 @@
 function ChessIt() {
 
-	var board,
-  		game = new Chess();
+  this.board;
+  this.game = new Chess();
 
 
-  var removeGreySquares = function() {
+  var self = this;
+
+  this.removeGreySquares = function() {
     $('#board .square-55d63').css('background', '');
   };
 
-  var greySquare = function(square) {
+  this.greySquare = function(square) {
     var squareEl = $('#board .square-' + square);
     
     var background = '#a9a9a9';
@@ -19,20 +21,20 @@ function ChessIt() {
     squareEl.css('background', background);
   };
 
-  var onDragStart = function(source, piece) {
+  this.onDragStart = function(source, piece) {
     // do not pick up pieces if the game is over
     // or if it's not that side's turn
 
-    if (game.game_over() === true || piece.search(/^w/) == -1) {
+    if (self.game.game_over() === true || piece.search(/^w/) == -1) {
       return false;
     }
   };
 
-  var onDrop = function(source, target) {
-    removeGreySquares();
+  this.onDrop = function(source, target) {
+    self.removeGreySquares();
 
     // see if the move is legal
-    var move = game.move({
+    var move = self.game.move({
       from: source,
       to: target,
       promotion: 'q' // NOTE: always promote to a queen for example simplicity
@@ -43,10 +45,10 @@ function ChessIt() {
 
   };
 
-  var onMouseoverSquare = function(square, piece) {
+  this.onMouseoverSquare = function(square, piece) {
     return;
     // get list of possible moves for this square
-    var moves = game.moves({
+    var moves = self.game.moves({
       square: square,
       verbose: true
     });
@@ -55,22 +57,22 @@ function ChessIt() {
     if (moves.length === 0) return;
 
     // highlight the square they moused over
-    greySquare(square);
+    self.greySquare(square);
 
     // highlight the possible squares for this piece
     for (var i = 0; i < moves.length; i++) {
-      greySquare(moves[i].to);
+      self.greySquare(moves[i].to);
     }
   };
 
-  var onMouseoutSquare = function(square, piece) {
-    removeGreySquares();
+  this.onMouseoutSquare = function(square, piece) {
+    self.removeGreySquares();
   };
 
-  var onSnapEnd = function() {
-    board.position(game.fen());
+  this.onSnapEnd = function() {
+    self.board.position(self.game.fen());
     
-    if (game.in_checkmate()){
+    if (self.game.in_checkmate()){
       alert("done");
     } else {
 
@@ -80,16 +82,33 @@ function ChessIt() {
 
   var cfg = {
     draggable: true,
-    position: 'start',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onMouseoutSquare: onMouseoutSquare,
-    onMouseoverSquare: onMouseoverSquare,
-    onSnapEnd: onSnapEnd
+    position: "ppppkppp/pppppppp/pppppppp/1pppppp1/2pppp2/3pp3/PPPPPPPP/RNBQKBNR w KQkq -",
+    onDragStart: this.onDragStart,
+    onDrop: this.onDrop,
+    onMouseoutSquare: this.onMouseoutSquare,
+    onMouseoverSquare: this.onMouseoverSquare,
+    onSnapEnd: this.onSnapEnd
   };
 
-  board = ChessBoard('board', cfg);
+  self.board = ChessBoard('board', cfg);
 
+}
+
+ChessIt.prototype.setPosition = function (position){
+
+  self = this;
+  
+  var cfg = {
+    draggable: true,
+    position: position,
+    onDragStart: this.onDragStart,
+    onDrop: this.onDrop,
+    onMouseoutSquare: this.onMouseoutSquare,
+    onMouseoverSquare: this.onMouseoverSquare,
+    onSnapEnd: this.onSnapEnd
+  };
+
+  this.board = ChessBoard('board', cfg);
 }
 
 ChessIt.prototype.out = function(){
